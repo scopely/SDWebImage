@@ -19,8 +19,27 @@ static char operationArrayKey;
     [self sd_setImageWithURL:url placeholderImage:nil options:0 progress:nil completed:nil];
 }
 
+- (void)sd_setImageWithURL:(NSURL *)url spinner:(BOOL)showSpinner {
+    [self sd_setImageWithURL:url placeholderImage:nil spinner:showSpinner];
+}
+
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder {
     [self sd_setImageWithURL:url placeholderImage:placeholder options:0 progress:nil completed:nil];
+}
+
+- (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder spinner:(BOOL)showSpinner {
+    UIActivityIndicatorView *spinner = nil;
+    if (showSpinner)
+    {
+        spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [spinner startAnimating];
+        spinner.frame = CGRectMake((placeholder.size.width - spinner.bounds.size.width)/2, (placeholder.size.height - spinner.bounds.size.height)/2, spinner.bounds.size.width, spinner.bounds.size.height);
+        [self addSubview:spinner];
+    }
+    
+    [self sd_setImageWithURL:url placeholderImage:placeholder completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+        [spinner removeFromSuperview];
+    }];
 }
 
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options {
