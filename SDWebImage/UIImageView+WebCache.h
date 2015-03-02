@@ -61,6 +61,8 @@
  */
 - (void)sd_setImageWithURL:(NSURL *)url;
 
+- (void)sd_setImageWithURL:(NSURL *)url spinner:(BOOL)showSpinner;
+
 /**
  * Set the imageView `image` with an `url` and a placeholder.
  *
@@ -71,6 +73,8 @@
  * @see sd_setImageWithURL:placeholderImage:options:
  */
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder;
+
+- (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder spinner:(BOOL)showSpinner;
 
 /**
  * Set the imageView `image` with an `url`, placeholder and custom options.
