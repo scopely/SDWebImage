@@ -33,7 +33,7 @@ static char operationArrayKey;
     {
         spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         [spinner startAnimating];
-        spinner.frame = CGRectMake((placeholder.size.width - spinner.bounds.size.width)/2, (placeholder.size.height - spinner.bounds.size.height)/2, spinner.bounds.size.width, spinner.bounds.size.height);
+        spinner.frame = CGRectMake((self.frame.size.width - spinner.bounds.size.width)/2, (self.frame.size.height - spinner.bounds.size.height)/2, spinner.bounds.size.width, spinner.bounds.size.height);
         [self addSubview:spinner];
     }
     
