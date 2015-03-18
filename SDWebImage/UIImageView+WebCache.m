@@ -12,6 +12,7 @@
 static char imageURLKey;
 static char operationKey;
 static char operationArrayKey;
+static NSInteger kSpinnerTag = 5671;
 
 @implementation UIImageView (WebCache)
 
@@ -28,10 +29,11 @@ static char operationArrayKey;
 }
 
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder spinner:(BOOL)showSpinner {
-    UIActivityIndicatorView *spinner = nil;
-    if (showSpinner)
+    UIActivityIndicatorView *spinner = (UIActivityIndicatorView *)[self viewWithTag:kSpinnerTag];
+    if (showSpinner && spinner == nil)
     {
         spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        spinner.tag = kSpinnerTag;
         [spinner startAnimating];
         spinner.frame = CGRectMake((self.frame.size.width - spinner.bounds.size.width)/2, (self.frame.size.height - spinner.bounds.size.height)/2, spinner.bounds.size.width, spinner.bounds.size.height);
         [self addSubview:spinner];
