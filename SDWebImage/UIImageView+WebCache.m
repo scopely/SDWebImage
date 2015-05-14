@@ -29,19 +29,7 @@ static NSInteger kSpinnerTag = 5671;
 }
 
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder spinner:(BOOL)showSpinner {
-    UIActivityIndicatorView *spinner = (UIActivityIndicatorView *)[self viewWithTag:kSpinnerTag];
-    if (showSpinner && spinner == nil)
-    {
-        spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        spinner.tag = kSpinnerTag;
-        [spinner startAnimating];
-        spinner.frame = CGRectMake((self.frame.size.width - spinner.bounds.size.width)/2, (self.frame.size.height - spinner.bounds.size.height)/2, spinner.bounds.size.width, spinner.bounds.size.height);
-        [self addSubview:spinner];
-    }
-    
-    [self sd_setImageWithURL:url placeholderImage:placeholder completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
-        [spinner removeFromSuperview];
-    }];
+    [self sd_setImageWithURL:url placeholderImage:placeholder options:0 progress:nil spinner:showSpinner completed:nil];
 }
 
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options {
@@ -49,7 +37,12 @@ static NSInteger kSpinnerTag = 5671;
 }
 
 - (void)sd_setImageWithURL:(NSURL *)url completed:(SDWebImageCompletionBlock)completedBlock {
-    [self sd_setImageWithURL:url placeholderImage:nil options:0 progress:nil completed:completedBlock];
+    [self sd_setImageWithURL:url spinner:NO completed:completedBlock];
+}
+
+- (void)sd_setImageWithURL:(NSURL *)url spinner:(BOOL)showSpinner completed:(SDWebImageCompletionBlock)completedBlock
+{
+    [self sd_setImageWithURL:url placeholderImage:nil options:0 progress:nil spinner:showSpinner completed:completedBlock];
 }
 
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder completed:(SDWebImageCompletionBlock)completedBlock {
@@ -61,6 +54,11 @@ static NSInteger kSpinnerTag = 5671;
 }
 
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDWebImageCompletionBlock)completedBlock {
+    [self sd_setImageWithURL:url placeholderImage:placeholder options:options progress:progressBlock spinner:NO completed:completedBlock];
+}
+
+- (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock spinner:(BOOL)showSpinner completed:(SDWebImageCompletionBlock)completedBlock
+{
     [self cancelCurrentImageLoad];
     objc_setAssociatedObject(self, &imageURLKey, url, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     self.image = placeholder;
@@ -71,7 +69,18 @@ static NSInteger kSpinnerTag = 5671;
     
     if (url) {
         __weak UIImageView *wself = self;
+        UIActivityIndicatorView *spinner = (UIActivityIndicatorView *)[self viewWithTag:kSpinnerTag];
+        if (showSpinner && spinner == nil)
+        {
+            spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+            spinner.tag = kSpinnerTag;
+            [spinner startAnimating];
+            spinner.frame = CGRectMake((self.frame.size.width - spinner.bounds.size.width)/2, (self.frame.size.height - spinner.bounds.size.height)/2, spinner.bounds.size.width, spinner.bounds.size.height);
+            [self addSubview:spinner];
+        }
         id <SDWebImageOperation> operation = [SDWebImageManager.sharedManager downloadImageWithURL:url options:options progress:progressBlock completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+            [spinner removeFromSuperview];
+            
             if (!wself) return;
             dispatch_main_sync_safe(^{
                 if (!wself) return;
