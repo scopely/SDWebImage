@@ -8,13 +8,13 @@
 
 #import "MKAnnotationView+WebCache.h"
 #import "objc/runtime.h"
+#import "UIView+WebCacheOperation.h"
 
 static char imageURLKey;
-static char operationKey;
 
 @implementation MKAnnotationView (WebCache)
 
-- (NSURL *)imageURL {
+- (NSURL *)sd_imageURL {
     return objc_getAssociatedObject(self, &imageURLKey);
 }
 
@@ -39,13 +39,13 @@ static char operationKey;
 }
 
 - (void)sd_setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options completed:(SDWebImageCompletionBlock)completedBlock {
-    [self cancelCurrentImageLoad];
+    [self sd_cancelCurrentImageLoad];
 
     objc_setAssociatedObject(self, &imageURLKey, url, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     self.image = placeholder;
 
     if (url) {
-        __weak MKAnnotationView *wself = self;
+        __weak __typeof(self)wself = self;
         id <SDWebImageOperation> operation = [SDWebImageManager.sharedManager downloadImageWithURL:url options:options progress:nil completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
             if (!wself) return;
             dispatch_main_sync_safe(^{
@@ -59,10 +59,10 @@ static char operationKey;
                 }
             });
         }];
-        objc_setAssociatedObject(self, &operationKey, operation, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [self sd_setImageLoadOperation:operation forKey:@"MKAnnotationViewImage"];
     } else {
         dispatch_main_async_safe(^{
-            NSError *error = [NSError errorWithDomain:@"SDWebImageErrorDomain" code:-1 userInfo:@{NSLocalizedDescriptionKey : @"Trying to load a nil url"}];
+            NSError *error = [NSError errorWithDomain:SDWebImageErrorDomain code:-1 userInfo:@{NSLocalizedDescriptionKey : @"Trying to load a nil url"}];
             if (completedBlock) {
                 completedBlock(nil, error, SDImageCacheTypeNone, url);
             }
@@ -70,19 +70,18 @@ static char operationKey;
     }
 }
 
-- (void)cancelCurrentImageLoad {
-    // Cancel in progress downloader from queue
-    id <SDWebImageOperation> operation = objc_getAssociatedObject(self, &operationKey);
-    if (operation) {
-        [operation cancel];
-        objc_setAssociatedObject(self, &operationKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
+- (void)sd_cancelCurrentImageLoad {
+    [self sd_cancelImageLoadOperationWithKey:@"MKAnnotationViewImage"];
 }
 
 @end
 
 
 @implementation MKAnnotationView (WebCacheDeprecated)
+
+- (NSURL *)imageURL {
+    return [self sd_imageURL];
+}
 
 - (void)setImageWithURL:(NSURL *)url {
     [self sd_setImageWithURL:url placeholderImage:nil options:0 completed:nil];
@@ -118,6 +117,10 @@ static char operationKey;
             completedBlock(image, error, cacheType);
         }
     }];
+}
+
+- (void)cancelCurrentImageLoad {
+    [self sd_cancelCurrentImageLoad];
 }
 
 @end

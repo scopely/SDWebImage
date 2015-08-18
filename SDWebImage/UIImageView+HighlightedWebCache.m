@@ -7,9 +7,9 @@
  */
 
 #import "UIImageView+HighlightedWebCache.h"
-#import "objc/runtime.h"
+#import "UIView+WebCacheOperation.h"
 
-static char operationKey;
+#define UIImageViewHighlightedWebCacheOperationKey @"highlightedImage"
 
 @implementation UIImageView (HighlightedWebCache)
 
@@ -30,10 +30,10 @@ static char operationKey;
 }
 
 - (void)sd_setHighlightedImageWithURL:(NSURL *)url options:(SDWebImageOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDWebImageCompletionBlock)completedBlock {
-    [self cancelCurrentImageLoad];
+    [self sd_cancelCurrentHighlightedImageLoad];
 
     if (url) {
-        __weak UIImageView      *wself    = self;
+        __weak __typeof(self)wself = self;
         id<SDWebImageOperation> operation = [SDWebImageManager.sharedManager downloadImageWithURL:url options:options progress:progressBlock completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
             if (!wself) return;
             dispatch_main_sync_safe (^
@@ -48,15 +48,19 @@ static char operationKey;
                                          }
                                      });
         }];
-        objc_setAssociatedObject(self, &operationKey, operation, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [self sd_setImageLoadOperation:operation forKey:UIImageViewHighlightedWebCacheOperationKey];
     } else {
         dispatch_main_async_safe(^{
-            NSError *error = [NSError errorWithDomain:@"SDWebImageErrorDomain" code:-1 userInfo:@{NSLocalizedDescriptionKey : @"Trying to load a nil url"}];
+            NSError *error = [NSError errorWithDomain:SDWebImageErrorDomain code:-1 userInfo:@{NSLocalizedDescriptionKey : @"Trying to load a nil url"}];
             if (completedBlock) {
                 completedBlock(nil, error, SDImageCacheTypeNone, url);
             }
         });
     }
+}
+
+- (void)sd_cancelCurrentHighlightedImageLoad {
+    [self sd_cancelImageLoadOperationWithKey:UIImageViewHighlightedWebCacheOperationKey];
 }
 
 @end
@@ -94,6 +98,10 @@ static char operationKey;
             completedBlock(image, error, cacheType);
         }
     }];
+}
+
+- (void)cancelCurrentHighlightedImageLoad {
+    [self sd_cancelCurrentHighlightedImageLoad];
 }
 
 @end
