@@ -29,7 +29,14 @@
                                                                                 style:UIBarButtonItemStylePlain
                                                                                target:self
                                                                                action:@selector(flushCache)];
+        
+        // HTTP NTLM auth example
+        // Add your NTLM image url to the array below and replace the credentials
+        [SDWebImageManager sharedManager].imageDownloader.username = @"httpwatch";
+        [SDWebImageManager sharedManager].imageDownloader.password = @"httpwatch01";
+        
         _objects = [NSArray arrayWithObjects:
+                    @"http://www.httpwatch.com/httpgallery/authentication/authenticatedimage/default.aspx?0.35786508303135633",     // requires HTTP auth, used to demo the NTLM auth
                     @"http://assets.sbnation.com/assets/2512203/dogflops.gif",
                     @"http://www.ioncannon.net/wp-content/uploads/2011/06/test2.webp",
                     @"http://www.ioncannon.net/wp-content/uploads/2011/06/test9.webp",
@@ -371,6 +378,9 @@
     {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
+
+    [cell.imageView setShowActivityIndicatorView:YES];
+    [cell.imageView setIndicatorStyle:UIActivityIndicatorViewStyleGray];
 
     cell.textLabel.text = [NSString stringWithFormat:@"Image #%ld", (long)indexPath.row];
     cell.imageView.contentMode = UIViewContentModeScaleAspectFill;

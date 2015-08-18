@@ -17,14 +17,14 @@
 /**
  * Get the current image URL.
  */
-- (NSURL *)currentImageURL;
+- (NSURL *)sd_currentImageURL;
 
 /**
  * Get the image URL for a control state.
  * 
  * @param state Which state you want to know the URL for. The values are described in UIControlState.
  */
-- (NSURL *)imageURLForState:(UIControlState)state;
+- (NSURL *)sd_imageURLForState:(UIControlState)state;
 
 /**
  * Set the imageView `image` with an `url`.
@@ -70,8 +70,8 @@
  * @param completedBlock A block called when operation has been completed. This block has no return value
  *                       and takes the requested UIImage as first parameter. In case of error the image parameter
  *                       is nil and the second parameter may contain an NSError. The third parameter is a Boolean
- *                       indicating if the image was retrived from the local cache of from the network.
- *                       The forth parameter is the original image url.
+ *                       indicating if the image was retrieved from the local cache or from the network.
+ *                       The fourth parameter is the original image url.
  */
 - (void)sd_setImageWithURL:(NSURL *)url forState:(UIControlState)state completed:(SDWebImageCompletionBlock)completedBlock;
 
@@ -86,8 +86,8 @@
  * @param completedBlock A block called when operation has been completed. This block has no return value
  *                       and takes the requested UIImage as first parameter. In case of error the image parameter
  *                       is nil and the second parameter may contain an NSError. The third parameter is a Boolean
- *                       indicating if the image was retrived from the local cache of from the network.
- *                       The forth parameter is the original image url.
+ *                       indicating if the image was retrieved from the local cache or from the network.
+ *                       The fourth parameter is the original image url.
  */
 - (void)sd_setImageWithURL:(NSURL *)url forState:(UIControlState)state placeholderImage:(UIImage *)placeholder completed:(SDWebImageCompletionBlock)completedBlock;
 
@@ -103,8 +103,8 @@
  * @param completedBlock A block called when operation has been completed. This block has no return value
  *                       and takes the requested UIImage as first parameter. In case of error the image parameter
  *                       is nil and the second parameter may contain an NSError. The third parameter is a Boolean
- *                       indicating if the image was retrived from the local cache of from the network.
- *                       The forth parameter is the original image url.
+ *                       indicating if the image was retrieved from the local cache or from the network.
+ *                       The fourth parameter is the original image url.
  */
 - (void)sd_setImageWithURL:(NSURL *)url forState:(UIControlState)state placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options completed:(SDWebImageCompletionBlock)completedBlock;
 
@@ -152,8 +152,8 @@
  * @param completedBlock A block called when operation has been completed. This block has no return value
  *                       and takes the requested UIImage as first parameter. In case of error the image parameter
  *                       is nil and the second parameter may contain an NSError. The third parameter is a Boolean
- *                       indicating if the image was retrived from the local cache of from the network.
- *                       The forth parameter is the original image url.
+ *                       indicating if the image was retrieved from the local cache or from the network.
+ *                       The fourth parameter is the original image url.
  */
 - (void)sd_setBackgroundImageWithURL:(NSURL *)url forState:(UIControlState)state completed:(SDWebImageCompletionBlock)completedBlock;
 
@@ -168,8 +168,8 @@
  * @param completedBlock A block called when operation has been completed. This block has no return value
  *                       and takes the requested UIImage as first parameter. In case of error the image parameter
  *                       is nil and the second parameter may contain an NSError. The third parameter is a Boolean
- *                       indicating if the image was retrived from the local cache of from the network.
- *                       The forth parameter is the original image url.
+ *                       indicating if the image was retrieved from the local cache or from the network.
+ *                       The fourth parameter is the original image url.
  */
 - (void)sd_setBackgroundImageWithURL:(NSURL *)url forState:(UIControlState)state placeholderImage:(UIImage *)placeholder completed:(SDWebImageCompletionBlock)completedBlock;
 
@@ -184,20 +184,28 @@
  * @param completedBlock A block called when operation has been completed. This block has no return value
  *                       and takes the requested UIImage as first parameter. In case of error the image parameter
  *                       is nil and the second parameter may contain an NSError. The third parameter is a Boolean
- *                       indicating if the image was retrived from the local cache of from the network.
- *                       The forth parameter is the original image url.
+ *                       indicating if the image was retrieved from the local cache or from the network.
+ *                       The fourth parameter is the original image url.
  */
 - (void)sd_setBackgroundImageWithURL:(NSURL *)url forState:(UIControlState)state placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options completed:(SDWebImageCompletionBlock)completedBlock;
 
 /**
- * Cancel the current download
+ * Cancel the current image download
  */
-- (void)cancelCurrentImageLoad;
+- (void)sd_cancelImageLoadForState:(UIControlState)state;
+
+/**
+ * Cancel the current backgroundImage download
+ */
+- (void)sd_cancelBackgroundImageLoadForState:(UIControlState)state;
 
 @end
 
 
 @interface UIButton (WebCacheDeprecated)
+
+- (NSURL *)currentImageURL __deprecated_msg("Use `sd_currentImageURL`");
+- (NSURL *)imageURLForState:(UIControlState)state __deprecated_msg("Use `sd_imageURLForState:`");
 
 - (void)setImageWithURL:(NSURL *)url forState:(UIControlState)state __deprecated_msg("Method deprecated. Use `sd_setImageWithURL:forState:`");
 - (void)setImageWithURL:(NSURL *)url forState:(UIControlState)state placeholderImage:(UIImage *)placeholder __deprecated_msg("Method deprecated. Use `sd_setImageWithURL:forState:placeholderImage:`");
@@ -214,5 +222,8 @@
 - (void)setBackgroundImageWithURL:(NSURL *)url forState:(UIControlState)state completed:(SDWebImageCompletedBlock)completedBlock __deprecated_msg("Method deprecated. Use `sd_setBackgroundImageWithURL:forState:completed:`");
 - (void)setBackgroundImageWithURL:(NSURL *)url forState:(UIControlState)state placeholderImage:(UIImage *)placeholder completed:(SDWebImageCompletedBlock)completedBlock __deprecated_msg("Method deprecated. Use `sd_setBackgroundImageWithURL:forState:placeholderImage:completed:`");
 - (void)setBackgroundImageWithURL:(NSURL *)url forState:(UIControlState)state placeholderImage:(UIImage *)placeholder options:(SDWebImageOptions)options completed:(SDWebImageCompletedBlock)completedBlock __deprecated_msg("Method deprecated. Use `sd_setBackgroundImageWithURL:forState:placeholderImage:options:completed:`");
+
+- (void)cancelCurrentImageLoad __deprecated_msg("Use `sd_cancelImageLoadForState:`");
+- (void)cancelBackgroundImageLoadForState:(UIControlState)state __deprecated_msg("Use `sd_cancelBackgroundImageLoadForState:`");
 
 @end
