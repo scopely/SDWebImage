@@ -39,7 +39,7 @@
                                                  height,
                                                  CGImageGetBitsPerComponent(imageRef),
                                                  0,
-                                                 (imageColorSpaceModel == 0 || imageColorSpaceModel == -1) ? RGBcolorSpace : CGImageGetColorSpace(imageRef),
+                                                 (imageColorSpaceModel == 0 || imageColorSpaceModel == -1 || imageColorSpaceModel == 5) ? RGBcolorSpace : CGImageGetColorSpace(imageRef),
                                                  kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedFirst);
 
     // Draw the image into the context and retrieve the new image, which will now have an alpha layer
